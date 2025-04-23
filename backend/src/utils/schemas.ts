@@ -10,3 +10,14 @@ export const loginUserSchema = z.object({
   email: z.string().email({message: "Email must be valid"}),
   password: z.string().min(6)
 });
+
+export const createBlogSchema = z.object({
+  title: z.string().min(5, {message: "Title must be at least 5 characters long"}),
+  description: z.string().min(10, {message: "Description must be at least 10 characters long"}),
+  thumbnailImage: z.string().url({message: "Thumbnail image must be a valid URL"}),
+  content: z.string().min(20, {message: "Content must be at least 20 characters long"}),
+});
+
+export const updateBlogSchema = createBlogSchema.partial().merge(z.object({
+  isPublished: z.boolean().optional(),
+}));

@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from "express";
 import indexRouter from "./routes/indexRoter";
 import authRouter from "./routes/authRouter";
 import passport from "./config/passport-config";
+import blogRouter from "./routes/blogRouter";
 
 require('dotenv').config();
 
@@ -14,10 +15,18 @@ app.use(express.urlencoded({ extended: true }));
 
 // routes
 app.use("/api/auth", authRouter)
+app.use("/api/blogs", blogRouter)
 app.use("/api", indexRouter)
 
-// Error handler
+// Catch-all for routes that don't exist
+app.use((req, res, next) => {
+  res.status(404).json({
+    status: 404,
+    message: "The route you are looking for does not exist.",
+  });
+});
 
+// Error handling middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   const statusCode = err.statusCode || 500;
 

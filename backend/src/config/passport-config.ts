@@ -1,7 +1,6 @@
 import passport from 'passport';
 import { Strategy as JwtStrategy, ExtractJwt, StrategyOptions } from 'passport-jwt';
-import { prisma } from '../prisma';
-import { User } from '@prisma/client';
+import { prisma } from '../prisma/client';
 
 interface JwtPayload {
   id: string;

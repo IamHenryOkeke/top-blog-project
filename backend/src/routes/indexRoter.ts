@@ -1,5 +1,5 @@
 import { Router } from "express";
-import isAuthenticated from "../middlewares/authMiddleware";
+import { isAuthenticated } from "../middlewares/authMiddlewares";
 
 export const indexRouter = Router();
 
