@@ -157,26 +157,33 @@ export async function deleteBlogPost( id: string, authorId: string ) {
         throw new AppError("Blog post not found", 404);
       }
     }
-
+    
     console.error("Error updating blog post:", error);
     throw new AppError("Internal server error", 500);
   }
 }
 
-export async function getCommentOfBlogPost(postId: string, offset: number, limit: number) {
+export async function createComment(values: { name: string, content: string; postId: string }) {
+  try {
+    const data = await prisma.comment.create({
+      data: values
+    })
+    return data;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error creating new comment", error.message);
+    } else {
+      console.error("Error creating new comment", error);
+    }
+    throw new AppError("Internal server error", 500)
+  }
+}
+
+export async function getCommentOfBlogPost(postId: string, offset: number, limit: number) { 
   try {
     const data = await prisma.comment.findMany({
       where: {
         postId
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          }
-        }
       },
       ...((limit > 0) && { take: limit }),
       skip: offset,
@@ -190,4 +197,69 @@ export async function getCommentOfBlogPost(postId: string, offset: number, limit
   }
 }
 
+export async function getCommentById(id: string) {
+  try {
+    const data = await prisma.comment.findUnique({
+      where: { id },
+      include: {
+        post: {
+          select: {
+            id: true,
+            title: true
+          }
+        }
+      }
+    })
+    return data;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error getting comment by id:", error.message);
+    } else {
+      console.error("Error getting comment by id:", error);
+    }
+    throw new AppError("Internal server error", 500)
+  }
+}
 
+export async function updateComment( id: string, postId: string, values: Partial<Prisma.CommentUpdateInput>) {
+  try {
+    const updatedComment = await prisma.comment.update({
+      where: {
+        id,
+        postId
+      },
+      data: values
+    });
+
+    return updatedComment;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2025") {
+        throw new AppError("Comment not found", 404);
+      }
+    }
+
+    console.error("Error updating Comment:", error);
+    throw new AppError("Internal server error", 500);
+  }
+}
+
+
+export async function deleteComment(id: string, postId: string) {
+  try {
+    const data = await prisma.comment.delete({
+      where: {
+        id,
+        postId
+      }
+    })
+    return data;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error deleting comment", error.message);
+    } else {
+      console.error("Error deleting comment", error);
+    }
+    throw new AppError("Internal server error", 500)
+  }
+}

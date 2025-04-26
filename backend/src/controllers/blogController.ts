@@ -2,14 +2,18 @@ import { Request, Response } from "express";
 import expressAsyncHandler from "express-async-handler";
 import { validate } from "../middlewares/validate";
 import { AppError } from "../error/errorHandler";
-import { createBlogSchema, updateBlogSchema } from "../utils/schemas";
+import { createBlogSchema, createCommentSchema, updateBlogSchema, updateCommentSchema } from "../utils/schemas";
 import { 
   createBlogPost as createBlog,
   getBlogPostById as getBlog,
   updateBlogPost as updateBlog,
   deleteBlogPost as deleteBlog,
   getAllBlogPosts as getBlogs,
-  getCommentOfBlogPost as getComments
+  getCommentOfBlogPost as getComments,
+  getCommentById as getComment,
+  createComment,
+  deleteComment,
+  updateComment
 } from "../db/queries";
 
 export const getAllBlogPosts = expressAsyncHandler(
@@ -65,7 +69,6 @@ export const getBlogPostById = expressAsyncHandler(
     });
   }
 );
-
 
 export const createBlogPost = expressAsyncHandler(
   async(req: Request, res: Response) => {
@@ -177,7 +180,7 @@ export const deleteBlogPost = expressAsyncHandler(
   }
 )
 
-export const getCommentsOfBlogPost = expressAsyncHandler(
+export const getBlogPostComments = expressAsyncHandler(
   async (req: Request, res: Response) => {
     const { blogId: id } = req.params;
     const { page = 1, limit = 10 } = req.query;
@@ -203,7 +206,8 @@ export const getCommentsOfBlogPost = expressAsyncHandler(
       throw new AppError("Blog not found", 404)
     }
 
-    const comments = await getComments(id, pageNumber, limitNumber);
+    const offset = (pageNumber - 1) * limitNumber;
+    const comments = await getComments(id, offset, limitNumber);
 
     res.status(200).json({
       message: "Comments fetched successfully",
@@ -211,3 +215,139 @@ export const getCommentsOfBlogPost = expressAsyncHandler(
     });
   }
 );
+
+export const getBlogPostCommentById = expressAsyncHandler(
+  async (req: Request, res: Response) => {
+    const { commentId: id } = req.params;
+
+    if (!id) {
+      throw new AppError("Comment ID is required", 400)
+    }
+
+    const comment = await getComment(id);
+
+    if (!comment) {
+      throw new AppError("Comment not found", 404)
+    }
+
+    res.status(200).json({
+      message: "Comment fetched successfully",
+      data: comment,
+    });
+  }
+);
+
+export const createBlogComment = expressAsyncHandler(
+  async(req: Request, res: Response) => {
+    const { blogId: id } = req.params;
+
+    if (!id) {
+      throw new AppError("Blog ID is required", 400)
+    }
+
+    const blog = await getBlog(id);
+
+    if (!blog) {
+      throw new AppError("Blog not found", 404)
+    }
+
+    const response = validate(createCommentSchema, req)
+    if (!response.success) {
+      throw new AppError(
+        "Invalid input",
+        400,
+        response.errors
+      );
+    }
+    
+    const { name, content } = response.data!;
+
+    const user = req.user as { id: string };
+
+    const values = {
+      content,
+      name,
+      postId: id
+    }
+
+    const data = await createComment(values)
+
+    if (data) {
+      res.status(201).json({
+        message: "Comment created successfully",
+        data
+      })
+      return
+    }
+  }
+)
+
+export const updateBlogComment = expressAsyncHandler(
+  async(req: Request, res: Response) => {
+    const { blogId, commentId } = req.params;
+
+    if (!blogId || !commentId) {
+      throw new AppError("Blog ID and Comment ID is required", 400)
+    }
+
+    const blog = await getBlog(blogId);
+    const comment = await getComment(commentId);
+
+    if (!blog || !comment) {
+      throw new AppError("Blog or Comment not found", 404)
+    }
+
+    const response = validate(updateCommentSchema, req)
+    if (!response.success) {
+      throw new AppError(
+        "Invalid input",
+        400,
+        response.errors
+      );
+    }
+    
+    const { name, content } = response.data!;
+
+    const values = {
+      name,
+      content
+    }
+
+    const data = await updateComment(commentId, blogId, values)
+
+    if (data) {
+      res.status(201).json({
+        message: "Comment updated successfully",
+        data
+      })
+      return
+    }
+  }
+)
+
+export const deleteBlogPostComment = expressAsyncHandler(
+  async(req: Request, res: Response) => {
+    const { blogId, commentId } = req.params;
+
+    if (!blogId || !commentId) {
+      throw new AppError("Blog ID and Comment ID is required", 400)
+    }
+
+    const blog = await getBlog(blogId);
+    const comment = await getComment(commentId);
+
+    if (!blog || !comment) {
+      throw new AppError("Blog or Comment not found", 404)
+    }
+
+    const data = await deleteComment(commentId, blogId)
+
+    if (data) {
+      res.status(201).json({
+        message: "Comment deleted successfully",
+        data
+      })
+      return
+    }
+  }
+)

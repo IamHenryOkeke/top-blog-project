@@ -15,7 +15,7 @@ datasource db {
 
 model User {
   id          String     @id @default(cuid())
-  name        String
+  name        String     @default("JOhn Doe")
   email       String     @unique
   password    String
   role        ROLE       @default(USER)
@@ -23,7 +23,6 @@ model User {
   updatedAt   DateTime   @updatedAt
   accessToken String?
   posts       BlogPost[]
-  comments    Comment[]
 
   @@index([email])
 }
@@ -40,15 +39,15 @@ model BlogPost {
   authorId       String
   user           User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   comments       Comment[]
+  tags           Tag[]     @relation("PostTags")
 }
 
 model Comment {
   id        String   @id @default(cuid())
+  name      String
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  authorId  String
-  user      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   postId    String
   post      BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
@@ -56,4 +55,14 @@ model Comment {
 enum ROLE {
   ADMIN
   USER
+}
+
+model Tag {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  posts     BlogPost[] @relation("PostTags")
+
+  @@index([name])
 }

@@ -7,8 +7,8 @@ export const createUserSchema = z.object({
 });
 
 export const loginUserSchema = z.object({
-  email: z.string().email({message: "Email must be valid"}),
-  password: z.string().min(6)
+  email: z.string({message: "Password is required"}).email({message: "Email must be valid"}),
+  password: z.string({message: "Password is required"}).min(6)
 });
 
 export const createBlogSchema = z.object({
@@ -21,3 +21,10 @@ export const createBlogSchema = z.object({
 export const updateBlogSchema = createBlogSchema.partial().merge(z.object({
   isPublished: z.boolean().optional(),
 }));
+
+export const createCommentSchema = z.object({
+  name: z.string().min(3, {message: "Name must be at least 3 characters long"}),
+  content: z.string().min(3, {message: "Comment must be at least 3 characters long"})
+});
+
+export const updateCommentSchema = createCommentSchema.partial()
