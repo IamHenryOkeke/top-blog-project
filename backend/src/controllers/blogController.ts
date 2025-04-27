@@ -90,7 +90,11 @@ export const createBlogPost = expressAsyncHandler(
       description,
       thumbnailImage,
       content,
-      authorId: user.id
+      user: {
+        connect: {
+          id: user.id
+        }
+      } 
     }
 
     const data = await createBlog(values)
@@ -262,12 +266,14 @@ export const createBlogComment = expressAsyncHandler(
     
     const { name, content } = response.data!;
 
-    const user = req.user as { id: string };
-
     const values = {
       content,
       name,
-      postId: id
+      post: {
+        connect: {
+          id
+        }
+      } 
     }
 
     const data = await createComment(values)

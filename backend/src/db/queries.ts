@@ -2,7 +2,7 @@ import { AppError } from "../error/errorHandler";
 import { Prisma } from "@prisma/client"; 
 import { prisma } from "../prisma/client";
 
-export async function registerUser(values: { name: string; email: string; password: string; }) {
+export async function registerUser(values: Prisma.UserCreateInput) {
   try {
     const data = await prisma.user.create({
       data: values
@@ -76,7 +76,7 @@ export async function getAllBlogPosts(offset: number, limit: number, searchTerm:
   }
 }
 
-export async function createBlogPost(values: { title: string; description: string; thumbnailImage: string; content: string; authorId: string }) {
+export async function createBlogPost(values: Prisma.BlogPostCreateInput) {
   try {
     const data = await prisma.blogPost.create({
       data: values
@@ -104,7 +104,8 @@ export async function getBlogPostById(id: string) {
             name: true,
             email: true
           }
-        }
+        },
+        tags: true
       }
     })
     return data;
@@ -163,7 +164,7 @@ export async function deleteBlogPost( id: string, authorId: string ) {
   }
 }
 
-export async function createComment(values: { name: string, content: string; postId: string }) {
+export async function createComment(values: Prisma.CommentCreateInput) {
   try {
     const data = await prisma.comment.create({
       data: values
