@@ -105,7 +105,12 @@ export async function getBlogPostById(id: string) {
             email: true
           }
         },
-        tags: true
+        tags: {
+          select: {
+            id: true,
+            name: true
+          }
+        }
       }
     })
     return data;
@@ -126,7 +131,15 @@ export async function updateBlogPost( id: string, authorId: string, values: Part
         id,
         authorId
       },
-      data: values
+      data: values,
+      include: {
+        tags: {
+          select: {
+            id: true,
+            name: true
+          }
+        }
+      }
     });
 
     return updatedPost;
@@ -245,7 +258,6 @@ export async function updateComment( id: string, postId: string, values: Partial
   }
 }
 
-
 export async function deleteComment(id: string, postId: string) {
   try {
     const data = await prisma.comment.delete({
@@ -260,6 +272,100 @@ export async function deleteComment(id: string, postId: string) {
       console.error("Error deleting comment", error.message);
     } else {
       console.error("Error deleting comment", error);
+    }
+    throw new AppError("Internal server error", 500)
+  }
+}
+
+export async function getAllTags(searchTerm: string) {
+  try {
+    const data = await prisma.tag.findMany({
+      where: {
+        name: { contains: searchTerm, mode: 'insensitive' },
+      }
+    });
+    return data;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error getting tags", error.message);
+    } else {
+      console.error("Error getting tags", error);
+    }
+    throw new AppError("Internal server error", 500)
+  }
+}
+
+export async function getTagById(id: string) {
+  try {
+    const data = await prisma.tag.findUnique({
+      where: { id },
+      include: {
+        posts: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            createdAt: true,
+            updatedAt: true
+          }
+        }
+      }
+    });
+    return data;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error getting tag by id", error.message);
+    } else {
+      console.error("Error getting tag by id", error);
+    }
+    throw new AppError("Internal server error", 500)
+  }
+}
+
+export async function createTag(values: Prisma.TagCreateInput) {
+  try {
+    const data = await prisma.tag.create({
+      data: values
+    })
+    return data;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error creating new tag", error.message);
+    } else {
+      console.error("Error creating new tag", error);
+    }
+    throw new AppError("Internal server error", 500)
+  }
+}
+
+export async function updateTag(id: string, values: Partial<Prisma.TagUpdateInput>) {
+  try {
+    const data = await prisma.tag.update({
+      where: { id },
+      data: values
+    })
+    return data;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error updating tag", error.message);
+    } else {
+      console.error("Error updating tag", error);
+    }
+    throw new AppError("Internal server error", 500)
+  }
+}
+
+export async function deleteTag(id: string) {
+  try {
+    const data = await prisma.tag.delete({
+      where: { id }
+    })
+    return data;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error deleting tag", error.message);
+    } else {
+      console.error("Error deleting tag", error);
     }
     throw new AppError("Internal server error", 500)
   }

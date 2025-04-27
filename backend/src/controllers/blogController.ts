@@ -81,7 +81,7 @@ export const createBlogPost = expressAsyncHandler(
       );
     }
     
-    const { title, description, content, thumbnailImage } = response.data!;
+    const { title, description, content, thumbnailImage, tags } = response.data!;
 
     const user = req.user as { id: string };
 
@@ -94,6 +94,11 @@ export const createBlogPost = expressAsyncHandler(
         connect: {
           id: user.id
         }
+      },
+      tags: {
+        connect: tags.map((tag) => ({
+          id: tag
+        }))
       } 
     }
 
@@ -132,7 +137,7 @@ export const updateBlogPost = expressAsyncHandler(
       );
     }
     
-    const { title, description, content, thumbnailImage, isPublished } = response.data!;
+    const { title, description, content, thumbnailImage, tags, isPublished } = response.data!;
 
     const user = req.user as { id: string };
 
@@ -141,7 +146,15 @@ export const updateBlogPost = expressAsyncHandler(
       description,
       thumbnailImage,
       content,
-      isPublished
+      isPublished,
+      ...(tags && {
+        tags: {
+          set: [],
+          connect: tags?.map((tag) => ({
+            id: tag
+          }))
+        }
+      })
     }
 
     const data = await updateBlog(id, user.id, values)

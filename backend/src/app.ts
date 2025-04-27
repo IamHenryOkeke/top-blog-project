@@ -3,6 +3,7 @@ import indexRouter from "./routes/indexRoter";
 import authRouter from "./routes/authRouter";
 import passport from "./config/passport-config";
 import blogRouter from "./routes/blogRouter";
+import tagRouter from "./routes/tagRouter";
 
 require('dotenv').config();
 
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 // routes
 app.use("/api/auth", authRouter)
 app.use("/api/blogs", blogRouter)
+app.use("/api/tags", tagRouter)
 app.use("/api", indexRouter)
 
 // Catch-all for routes that don't exist
