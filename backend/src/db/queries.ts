@@ -46,14 +46,15 @@ export async function getUserByEmail(email: string) {
   }
 }
 
-export async function getAllBlogPosts(offset: number, limit: number, searchTerm: string) {
+export async function getAllBlogPosts(offset: number, limit: number, searchTerm: string, isPublished: boolean | undefined) {
   try {
     const data = await prisma.blogPost.findMany({
       where: {
         OR: [
           { title: { contains: searchTerm, mode: 'insensitive' } },
           { description: { contains: searchTerm, mode: 'insensitive' } },
-        ]
+        ],
+        isPublished
       },
       include: {
         user: {

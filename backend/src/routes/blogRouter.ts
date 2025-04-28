@@ -12,10 +12,11 @@ import {
   deleteBlogPostComment
 } from "../controllers/blogController";
 import { isAuthenticated, isAdmin } from "../middlewares/authMiddlewares";
+import { optionalAuth } from "../middlewares/optionalAuthMiddleware";
 
 const blogRouter = Router();
 
-blogRouter.get("/", getAllBlogPosts)
+blogRouter.get("/", optionalAuth, getAllBlogPosts)
 blogRouter.post("/", isAuthenticated, isAdmin, createBlogPost)
 
 blogRouter.get("/:blogId", getBlogPostById)

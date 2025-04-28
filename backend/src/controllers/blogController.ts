@@ -18,6 +18,8 @@ import {
 
 export const getAllBlogPosts = expressAsyncHandler(
   async(req: Request, res: Response) => {
+    const user = req.user as { id: string, role: string };
+
     const { page = 1, limit = 10, searchTerm = "" } = req.query;
     const pageNumber = Number(page);
     const limitNumber = Number(limit);
@@ -32,8 +34,9 @@ export const getAllBlogPosts = expressAsyncHandler(
 
     const offset = (pageNumber - 1) * limitNumber;
     
-    const blogs = await getBlogs(offset, limitNumber, String(searchTerm));
-    const totalBlogs = await getBlogs(0, 0, String(searchTerm));
+    const isPublished = user?.role === "ADMIN" ? undefined : true;
+    const blogs = await getBlogs(offset, limitNumber, String(searchTerm).trim(), isPublished);
+    const totalBlogs = await getBlogs(0, 0, String(searchTerm).trim(), isPublished);
     const totalPages = Math.ceil(totalBlogs.length / limitNumber);
 
     res.status(200).json({
