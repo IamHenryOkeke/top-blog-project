@@ -9,7 +9,8 @@ import {
   updateBlogPost, 
   createBlogComment, 
   updateBlogComment,
-  deleteBlogPostComment
+  deleteBlogPostComment,
+  getLatestBlogPosts
 } from "../controllers/blogController";
 import { isAuthenticated, isAdmin } from "../middlewares/authMiddlewares";
 import { optionalAuth } from "../middlewares/optionalAuthMiddleware";
@@ -17,6 +18,7 @@ import { optionalAuth } from "../middlewares/optionalAuthMiddleware";
 const blogRouter = Router();
 
 blogRouter.get("/", optionalAuth, getAllBlogPosts)
+blogRouter.get("/latest", optionalAuth, getLatestBlogPosts)
 blogRouter.post("/", isAuthenticated, isAdmin, createBlogPost)
 
 blogRouter.get("/:blogId", getBlogPostById)

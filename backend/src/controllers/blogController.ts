@@ -52,6 +52,21 @@ export const getAllBlogPosts = expressAsyncHandler(
   }
 )
 
+export const getLatestBlogPosts = expressAsyncHandler(
+  async(req: Request, res: Response) => {
+    const user = req.user as { id: string, role: string };
+
+    const isPublished = user?.role === "ADMIN" ? undefined : true;
+    const blogs = await getBlogs(0, 0, "", isPublished);
+    const latestBlogs = blogs.slice(0, 4);
+
+    res.status(200).json({
+      message: "Latest Blogs fetched successfully",
+      data: latestBlogs
+    });
+  }
+)
+
 export const getBlogPostById = expressAsyncHandler(
   async (req: Request, res: Response) => {
     const { blogId: id } = req.params;
