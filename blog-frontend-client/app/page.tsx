@@ -1,5 +1,6 @@
 import BlogCard from "@/components/blog-card";
 import { BlogService } from "@/services/blog";
+import Link from "next/link";
 
 export default async function Home() {
   const res = await BlogService.getLatestBlogs();
@@ -20,7 +21,7 @@ export default async function Home() {
       <section className="max-w-4xl mx-auto px-4 py-8">
         <div className="grid md:grid-cols-2 gap-8">
           {
-            blogs.map((blog: {id: string, title: string, description: string, createdAt: string}) => (
+            blogs.map((blog: { id: string, title: string, description: string, createdAt: string }) => (
               <BlogCard
                 key={blog.id}
                 id={blog.id}
@@ -31,10 +32,10 @@ export default async function Home() {
             ))
           }
         </div>
+        <div className="text-center mt-8">
+          <Link href="/blogs" className="inline-block bg-[#4682B4] text-white px-4 py-2 rounded hover:bg-[#3A6E99] transition">View All Blogs</Link>
+        </div>
       </section>
-
-
-
     </main>
   );
 }

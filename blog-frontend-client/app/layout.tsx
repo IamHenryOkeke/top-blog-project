@@ -4,6 +4,7 @@ import Navabr from "@/components/navbar";
 import Footer from "@/components/footer";
 
 import { League_Spartan } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 
 const leagueSpartan = League_Spartan({
   variable: "--font-league-spartan",
@@ -23,6 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`lg:max-w-7xl mx-auto  antialiased bg-[#FAFAFA] text-[#333333] ${leagueSpartan.className}`}>
+        <Toaster />
         <Navabr />
         {children}
         <Footer />
