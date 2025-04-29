@@ -1,13 +1,16 @@
 import express, { Request, Response, NextFunction } from "express";
+import cors from "cors";
 import indexRouter from "./routes/indexRoter";
 import authRouter from "./routes/authRouter";
 import passport from "./config/passport-config";
 import blogRouter from "./routes/blogRouter";
 import tagRouter from "./routes/tagRouter";
+import corsOptions from "./config/cors";
 
 require('dotenv').config();
 
 const app = express();
+app.use(cors(corsOptions));
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
