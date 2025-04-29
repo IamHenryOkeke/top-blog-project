@@ -46,7 +46,7 @@ export async function getUserByEmail(email: string) {
   }
 }
 
-export async function getAllBlogPosts(offset: number, limit: number, searchTerm: string, isPublished: boolean | undefined) {
+export async function getAllBlogPosts(offset: number, limit: number, searchTerm: string, isPublished: boolean | undefined, tag?: string) {
   try {
     const data = await prisma.blogPost.findMany({
       where: {
@@ -54,7 +54,14 @@ export async function getAllBlogPosts(offset: number, limit: number, searchTerm:
           { title: { contains: searchTerm, mode: 'insensitive' } },
           { description: { contains: searchTerm, mode: 'insensitive' } },
         ],
-        isPublished
+        isPublished: {
+          equals: isPublished
+        },
+        ...(tag && {tags: {
+          some: {
+            name: tag
+          }
+        }})
       },
       include: {
         user: {

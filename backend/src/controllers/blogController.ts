@@ -20,10 +20,10 @@ export const getAllBlogPosts = expressAsyncHandler(
   async(req: Request, res: Response) => {
     const user = req.user as { id: string, role: string };
 
-    const { page = 1, limit = 10, searchTerm = "" } = req.query;
+    const { page = 1, limit = 10, searchTerm = "", tag = "" } = req.query;
+
     const pageNumber = Number(page);
     const limitNumber = Number(limit);
-
     if (pageNumber < 1 || limitNumber < 1 || isNaN(pageNumber) || isNaN(limitNumber)) {
       throw new AppError("Page and limit must be a number greater than 0", 400)
     }
@@ -35,8 +35,9 @@ export const getAllBlogPosts = expressAsyncHandler(
     const offset = (pageNumber - 1) * limitNumber;
     
     const isPublished = user?.role === "ADMIN" ? undefined : true;
-    const blogs = await getBlogs(offset, limitNumber, String(searchTerm).trim(), isPublished);
-    const totalBlogs = await getBlogs(0, 0, String(searchTerm).trim(), isPublished);
+
+    const blogs = await getBlogs(offset, limitNumber, String(searchTerm).trim(), isPublished, String(tag).trim());
+    const totalBlogs = await getBlogs(0, 0, String(searchTerm).trim(), isPublished, String(tag).trim());
     const totalPages = Math.ceil(totalBlogs.length / limitNumber);
 
     res.status(200).json({
@@ -57,7 +58,7 @@ export const getLatestBlogPosts = expressAsyncHandler(
     const user = req.user as { id: string, role: string };
 
     const isPublished = user?.role === "ADMIN" ? undefined : true;
-    const blogs = await getBlogs(0, 0, "", isPublished);
+    const blogs = await getBlogs(0, 0, "", isPublished, "");
     const latestBlogs = blogs.slice(0, 4);
 
     res.status(200).json({
