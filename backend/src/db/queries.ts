@@ -18,6 +18,54 @@ export async function registerUser(values: Prisma.UserCreateInput) {
   }
 }
 
+export async function createOTP(values: Prisma.OTPCreateInput) {
+  try {
+    const data = await prisma.oTP.create({
+      data: values
+    })
+    return data;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error creating new otp:", error.message);
+    } else {
+      console.error("Error creating new otp:", error);
+    }
+    throw new AppError("Internal server error", 500)
+  }
+}
+
+export async function getOTP(email: string) {
+  try {
+    const data = await prisma.oTP.findFirst({
+      where: { email }
+    })
+    return data;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error finding otp:", error.message);
+    } else {
+      console.error("Error finding otp:", error);
+    }
+    throw new AppError("Internal server error", 500)
+  }
+}
+
+export async function deleteOTP(email: string) {
+  try {
+    const data = await prisma.oTP.deleteMany({
+      where: { email }
+    })
+    return data;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error deleting otp:", error.message);
+    } else {
+      console.error("Error deleting otp:", error);
+    }
+    throw new AppError("Internal server error", 500)
+  }
+}
+
 export async function updateUser(id: string, values: any) {
   try {
     const data = await prisma.user.update({

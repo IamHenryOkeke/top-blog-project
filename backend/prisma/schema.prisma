@@ -66,3 +66,14 @@ model Tag {
 
   @@index([name])
 }
+
+model OTP {
+  id        String   @id @default(cuid())
+  email     String
+  code      String
+  createdAt DateTime @default(now())
+  expires   DateTime
+
+  @@index([email])
+  @@index([code])
+}

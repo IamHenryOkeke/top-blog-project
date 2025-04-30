@@ -7,9 +7,20 @@ export const createUserSchema = z.object({
 });
 
 export const loginUserSchema = z.object({
-  email: z.string({message: "Password is required"}).email({message: "Email must be valid"}),
+  email: z.string({message: "Email is required"}).email({message: "Email must be valid"}),
   password: z.string({message: "Password is required"}).min(6)
 });
+
+export const sendOTPSchema = loginUserSchema.pick({
+  email: true
+})
+
+export const resetPassswordSchema = loginUserSchema.merge(z.object({
+  otp: z
+      .string()
+      .length(6, "OTP must be 6 digits")
+      .regex(/^\d{6}$/, "OTP must be numeric"),
+}));
 
 export const createBlogSchema = z.object({
   title: z.string().min(5, {message: "Title must be at least 5 characters long"}),

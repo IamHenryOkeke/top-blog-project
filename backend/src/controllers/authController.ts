@@ -1,12 +1,14 @@
 import expressAsyncHandler from "express-async-handler";
 import { validate } from "../middlewares/validate";
-import { createUserSchema, loginUserSchema } from "../utils/schemas";
-import { genPassword } from "../utils/passwordUtils";
-import { getUserByEmail, registerUser, updateUser } from "../db/queries";
+import { createUserSchema, loginUserSchema, resetPassswordSchema, sendOTPSchema } from "../utils/schemas";
+import { genPassword, validPassword } from "../utils/passwordUtils";
+import { createOTP, deleteOTP, getOTP, getUserByEmail, registerUser, updateUser } from "../db/queries";
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { AppError } from "../error/errorHandler";
 import jwt from 'jsonwebtoken'
+import generateOTP from "../utils/otp";
+import { sendMail } from "../utils/nodemailer";
 
 export const userSignUp = expressAsyncHandler(
   async(req: Request, res: Response): Promise <void> => {
@@ -92,6 +94,99 @@ export const userLogin = expressAsyncHandler(
   }
 )
 
+export const sendOTP = expressAsyncHandler(
+  async(req: Request, res: Response): Promise <void> => {
+    const response = validate(sendOTPSchema, req)
+    if (!response.success) {
+      throw new AppError(
+        "Invalid input",
+        400,
+        response.errors
+      );
+    }
+
+    const {email} = response.data!;
+
+    const isExistingUser = await getUserByEmail(email);
+
+    if(!isExistingUser) {
+      throw new AppError("Invalid credentials", 401)
+    }
+    
+    const isExistingOTPEmail = await getOTP(email);
+
+    if(isExistingOTPEmail) {
+      await deleteOTP(isExistingOTPEmail.email);
+    }
+
+    const otp = generateOTP();
+
+    const hashedOTP = await bcrypt.hash(otp, 10);
+
+    const data = {
+      email,
+      code: hashedOTP,
+      expires: new Date(Date.now() + 10 * 60 * 1000)
+    }
+
+    await sendMail("Password Reset OTP", isExistingUser.name, email, `Your OTP is ${otp}. It will expire in 10 minutes.`)
+
+    await createOTP(data);
+
+    res.status(200).json({
+      message: `OTP sent successfully to ${email}`,
+    })
+  }
+)
+
+export const resetPassword = expressAsyncHandler(
+  async(req: Request, res: Response): Promise <void> => {
+    const response = validate(resetPassswordSchema, req)
+    if (!response.success) {
+      throw new AppError(
+        "Invalid input",
+        400,
+        response.errors
+      );
+    }
+
+    const {email, password, otp} = response.data!;
+
+    const isExistingOTP = await getOTP(email);
+
+    if(!isExistingOTP) {
+      throw new AppError("Invalid OTP", 401)
+    }
+
+    const isExpired = new Date() > isExistingOTP.expires;
+
+    if(isExpired) {
+      throw new AppError("OTP expired", 401)
+    }
+
+    const isExistingUser = await getUserByEmail(email);
+    if(!isExistingUser) {
+      throw new AppError("Invalid credentials or OTP", 401);
+    }
+
+    const isValidOTP = await bcrypt.compare(otp, isExistingOTP.code);
+    if(!isValidOTP) {
+      throw new AppError("Invalid OTP", 401)
+    }
+    
+    const hashedPassword = await genPassword(password);
+    const data = {
+      password: hashedPassword
+    }
+    await updateUser(isExistingUser.id, data);
+
+    await deleteOTP(isExistingOTP.email);
+
+    res.status(200).json({
+      message: `Password reset successfully for ${email}`
+    })
+  }
+)
 
 export const userLogout = expressAsyncHandler(
   async(req: Request, res: Response) => {
