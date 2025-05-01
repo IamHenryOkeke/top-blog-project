@@ -14,7 +14,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     }
   }, [hydrated, token, loggedIn, router]);
 
-  if (!hydrated) return null; // Wait for Zustand to hydrate
+  if (hydrated) return null; // Wait for Zustand to hydrate
   if (token && loggedIn) return null; // Already redirected
 
   return (
