@@ -8,6 +8,7 @@ const useAuthStore = create(
     combine(
       {
         loggedIn: false,
+        hydrated: false,
         token: null as string | null | AxiosBasicCredentials,
         profile: null as | null | any
       },
@@ -21,6 +22,9 @@ const useAuthStore = create(
         setUserProfile: (profile: any) => {
           set({ profile, loggedIn: true });
         },
+        setHydrated: (value: boolean) => {
+          set({ hydrated: value });
+        },
         logout: () => {
           set({
             loggedIn: false,
@@ -33,9 +37,12 @@ const useAuthStore = create(
     ),
     {
       name: "nmesoma-blog-auth",
-      storage: createJSONStorage(() => localStorage)
+      storage: createJSONStorage(() => localStorage),
+      onRehydrateStorage: () => (state) => {
+        state?.setHydrated(true);
+      },
     }
   )
-);
+)
 
 export default useAuthStore;
