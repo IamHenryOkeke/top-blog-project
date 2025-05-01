@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Navabr from "@/components/navbar";
+import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 
 import { League_Spartan } from "next/font/google";
@@ -23,9 +23,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`lg:max-w-7xl mx-auto  antialiased bg-[#FAFAFA] text-[#333333] ${leagueSpartan.className}`}>
+      <body className={`lg:max-w-7xl mx-auto  antialiased bg-background text-primary ${leagueSpartan.className}`}>
         <Toaster />
-        <Navabr />
+        <Navbar />
         {children}
         <Footer />
       </body>

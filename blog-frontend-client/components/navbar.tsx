@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react';
 
-export default function Navabr() {
+export default function Navbar() {
   const navLinks = [
     { label: 'Home', href: '/' },
     { label: 'Blog', href: '/blogs' },
