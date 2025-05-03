@@ -1,6 +1,4 @@
 import expressAsyncHandler from "express-async-handler";
-import { validate } from "../middlewares/validate";
-import { createUserSchema, loginUserSchema, resetPassswordSchema, sendOTPSchema } from "../utils/schemas";
 import { genPassword, validPassword } from "../utils/passwordUtils";
 import { createOTP, deleteOTP, getOTP, getUserByEmail, registerUser, updateUser } from "../db/queries";
 import { Request, Response } from "express";
@@ -12,16 +10,7 @@ import { sendMail } from "../utils/nodemailer";
 
 export const userSignUp = expressAsyncHandler(
   async(req: Request, res: Response): Promise <void> => {
-    const response = validate(createUserSchema, req)
-    if (!response.success) {
-      throw new AppError(
-        "Invalid input",
-        400,
-        response.errors
-      );
-    }
-    
-    const { name, email, password} = response.data!;
+    const { name, email, password} = req.body;
     const existingUser = await getUserByEmail(email.toLowerCase());
 
     if (existingUser) {
@@ -53,23 +42,14 @@ export const userSignUp = expressAsyncHandler(
 
 export const userLogin = expressAsyncHandler(
   async(req: Request, res: Response): Promise <void> => {
-    const response = validate(loginUserSchema, req)
-    if (!response.success) {
-      throw new AppError(
-        "Invalid input",
-        400,
-        response.errors
-      );
-    }
-
-    const {email, password} = response.data!;
+    const {email, password} = req.body;
 
     const isExistingUser = await getUserByEmail(email);
     if(!isExistingUser) {
       throw new AppError("invalid credentials", 401)
     }
 
-    const isValidPassword = await bcrypt.compare(password, isExistingUser.password)
+    const isValidPassword = await validPassword(password, isExistingUser.password)
     if(!isValidPassword) {
       throw new AppError("invalid credentials", 401)
     }
@@ -96,16 +76,7 @@ export const userLogin = expressAsyncHandler(
 
 export const sendOTP = expressAsyncHandler(
   async(req: Request, res: Response): Promise <void> => {
-    const response = validate(sendOTPSchema, req)
-    if (!response.success) {
-      throw new AppError(
-        "Invalid input",
-        400,
-        response.errors
-      );
-    }
-
-    const {email} = response.data!;
+    const {email} = req.body;
 
     const isExistingUser = await getUserByEmail(email);
 
@@ -141,16 +112,7 @@ export const sendOTP = expressAsyncHandler(
 
 export const resetPassword = expressAsyncHandler(
   async(req: Request, res: Response): Promise <void> => {
-    const response = validate(resetPassswordSchema, req)
-    if (!response.success) {
-      throw new AppError(
-        "Invalid input",
-        400,
-        response.errors
-      );
-    }
-
-    const {email, password, otp} = response.data!;
+    const {email, password, otp} = req.body;
 
     const isExistingOTP = await getOTP(email);
 

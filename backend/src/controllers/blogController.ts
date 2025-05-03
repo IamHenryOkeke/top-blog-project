@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import expressAsyncHandler from "express-async-handler";
-import { validate } from "../middlewares/validate";
 import { AppError } from "../error/errorHandler";
-import { createBlogSchema, createCommentSchema, updateBlogSchema, updateCommentSchema } from "../utils/schemas";
 import { 
   createBlogPost as createBlog,
   getBlogPostById as getBlog,
@@ -91,16 +89,7 @@ export const getBlogPostById = expressAsyncHandler(
 
 export const createBlogPost = expressAsyncHandler(
   async(req: Request, res: Response) => {
-    const response = validate(createBlogSchema, req)
-    if (!response.success) {
-      throw new AppError(
-        "Invalid input",
-        400,
-        response.errors
-      );
-    }
-    
-    const { title, description, content, thumbnailImage, tags } = response.data!;
+    const { title, description, content, thumbnailImage, tags } = req.body;
 
     const user = req.user as { id: string };
 
@@ -115,7 +104,7 @@ export const createBlogPost = expressAsyncHandler(
         }
       },
       tags: {
-        connect: tags.map((tag) => ({
+        connect: tags.map((tag: string) => ({
           id: tag
         }))
       } 
@@ -146,17 +135,8 @@ export const updateBlogPost = expressAsyncHandler(
     if (!blog) {
       throw new AppError("Blog not found", 404)
     }
-
-    const response = validate(updateBlogSchema, req)
-    if (!response.success) {
-      throw new AppError(
-        "Invalid input",
-        400,
-        response.errors
-      );
-    }
     
-    const { title, description, content, thumbnailImage, tags, isPublished } = response.data!;
+    const { title, description, content, thumbnailImage, tags, isPublished } = req.body;
 
     const user = req.user as { id: string };
 
@@ -169,7 +149,7 @@ export const updateBlogPost = expressAsyncHandler(
       ...(tags && {
         tags: {
           set: [],
-          connect: tags?.map((tag) => ({
+          connect: tags?.map((tag: string) => ({
             id: tag
           }))
         }
@@ -286,17 +266,8 @@ export const createBlogComment = expressAsyncHandler(
     if (!blog) {
       throw new AppError("Blog not found", 404)
     }
-
-    const response = validate(createCommentSchema, req)
-    if (!response.success) {
-      throw new AppError(
-        "Invalid input",
-        400,
-        response.errors
-      );
-    }
     
-    const { name, content } = response.data!;
+    const { name, content } = req.body;
 
     const values = {
       content,
@@ -334,17 +305,8 @@ export const updateBlogComment = expressAsyncHandler(
     if (!blog || !comment) {
       throw new AppError("Blog or Comment not found", 404)
     }
-
-    const response = validate(updateCommentSchema, req)
-    if (!response.success) {
-      throw new AppError(
-        "Invalid input",
-        400,
-        response.errors
-      );
-    }
     
-    const { name, content } = response.data!;
+    const { name, content } = req.body;
 
     const values = {
       name,

@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import expressAsyncHandler from "express-async-handler";
-import { validate } from "../middlewares/validate";
 import { AppError } from "../error/errorHandler";
 import { 
   getAllTags as getTags,
@@ -9,7 +8,6 @@ import {
   updateTag as updateTagById,
   deleteTag as deleteTagById
 } from "../db/queries";
-import { createTagSchema, updateTagSchema } from "../utils/schemas";
 
 export const getAllTags = expressAsyncHandler(
   async(req: Request, res: Response) => {
@@ -47,16 +45,7 @@ export const getTagById = expressAsyncHandler(
 
 export const createTag = expressAsyncHandler(
   async(req: Request, res: Response) => {
-    const response = validate(createTagSchema, req)
-    if (!response.success) {
-      throw new AppError(
-        "Invalid input",
-        400,
-        response.errors
-      );
-    }
-    
-    const { name } = response.data!;
+    const { name } = req.body;
 
     const values = {
       name: name.toLowerCase()
@@ -87,17 +76,8 @@ export const updateTag = expressAsyncHandler(
     if (!tag) {
       throw new AppError("Tag not found", 404)
     }
-
-    const response = validate(updateTagSchema, req)
-    if (!response.success) {
-      throw new AppError(
-        "Invalid input",
-        400,
-        response.errors
-      );
-    }
     
-    const { name } = response.data!;
+    const { name } = req.body;
 
     const values = {
       name: name?.toLowerCase()
