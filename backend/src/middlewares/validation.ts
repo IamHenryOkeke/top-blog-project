@@ -2,15 +2,35 @@ import { ZodSchema } from 'zod';
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../error/errorHandler';
 
-export const validate =
-  (schema: ZodSchema<any>, source: 'body' | 'query' | 'params' = 'body') =>
-  (req: Request, res: Response, next: NextFunction) => {
-    const result = schema.safeParse(req[source]);
+type SchemaMap = {
+  body?: ZodSchema;
+  query?: ZodSchema;
+  params?: ZodSchema;
+};
 
-    if (!result.success) {
-      const errorDetails = result.error.flatten().fieldErrors;
-      throw new AppError('Validation failed', 400, errorDetails)
+export const validate =
+(schemas: SchemaMap) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    let errorDetails = {};
+
+    if (schemas.body) {
+      const result = schemas.body.safeParse(req.body);
+      if (!result.success) throw new AppError('Validation failed', 400, result.error.flatten().fieldErrors);
+      req.body = result.data;
     }
-    req[source] = result.data;
+
+    if (schemas.query) {
+      const result = schemas.query.safeParse(req.query);
+      if (!result.success) throw new AppError('Validation failed', 400, result.error.flatten().fieldErrors);
+      req.query = result.data;
+    }
+
+    if (schemas.params) {
+      const result = schemas.params.safeParse(req.params);
+      if (!result.success) throw new AppError('Validation failed', 400, result.error.flatten().fieldErrors);
+      req.params = result.data;
+    }
+    
+    // If all validations pass, call the next middleware
     next();
   };

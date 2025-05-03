@@ -8,9 +8,9 @@ const tagRouter = Router();
 
 tagRouter.get("/", getAllTags)
 
-tagRouter.post("/", isAuthenticated, isAdmin, validate(createTagSchema), createTag)
+tagRouter.post("/", isAuthenticated, isAdmin, validate({body: createTagSchema}), createTag)
 tagRouter.get("/:tagId", getTagById)
-tagRouter.put("/:tagId", isAuthenticated, isAdmin, validate(updateTagSchema), updateTag)
+tagRouter.put("/:tagId", isAuthenticated, isAdmin, validate({body: updateTagSchema}), updateTag)
 tagRouter.delete("/:tagId", isAuthenticated, isAdmin, deleteTag)
 
 export default tagRouter;
