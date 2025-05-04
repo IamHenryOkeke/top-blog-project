@@ -15,24 +15,24 @@ import {
 import { isAuthenticated, isAdmin } from "../middlewares/authMiddlewares";
 import { optionalAuth } from "../middlewares/optionalAuthMiddleware";
 import { validate } from "../middlewares/validation";
-import { createBlogSchema, createCommentSchema, updateBlogSchema, updateCommentSchema } from "../utils/schemas";
+import { blogParamsSchema, blogQuerySchema, commentParamsSchema, createBlogSchema, createCommentSchema, updateBlogSchema, updateCommentSchema } from "../utils/schemas";
 
 const blogRouter = Router();
 
-blogRouter.get("/", optionalAuth, getAllBlogPosts)
+blogRouter.get("/", optionalAuth, validate({query: blogQuerySchema}), getAllBlogPosts)
 blogRouter.get("/latest", optionalAuth, getLatestBlogPosts)
 blogRouter.post("/", isAuthenticated, isAdmin, validate({body: createBlogSchema}), createBlogPost)
 
-blogRouter.get("/:blogId", getBlogPostById)
-blogRouter.put("/:blogId", isAuthenticated, isAdmin, validate({body: updateBlogSchema}), updateBlogPost)
-blogRouter.delete("/:blogId", isAuthenticated, isAdmin, deleteBlogPost)
+blogRouter.get("/:blogId", validate({params: blogParamsSchema}), optionalAuth,  getBlogPostById)
+blogRouter.put("/:blogId", isAuthenticated, isAdmin, validate({body: updateBlogSchema, params: blogParamsSchema}), updateBlogPost)
+blogRouter.delete("/:blogId", isAuthenticated, isAdmin,validate({params: blogParamsSchema}), deleteBlogPost)
 
-blogRouter.get("/:blogId/comments", getBlogPostComments)
-blogRouter.post("/:blogId/comments", validate({body: createCommentSchema}), createBlogComment)
+blogRouter.get("/:blogId/comments", validate({params: blogParamsSchema}), optionalAuth, getBlogPostComments)
+blogRouter.post("/:blogId/comments", validate({body: createCommentSchema, params: blogParamsSchema}), createBlogComment)
 
-blogRouter.get("/:blogId/comments/:commentId", getBlogPostCommentById)
+blogRouter.get("/:blogId/comments/:commentId", validate({params: commentParamsSchema}), optionalAuth, getBlogPostCommentById)
 
-blogRouter.put("/:blogId/comments/:commentId", isAuthenticated, isAdmin, validate({body: updateCommentSchema}), updateBlogComment)
-blogRouter.delete("/:blogId/comments/:commentId", isAuthenticated, isAdmin, deleteBlogPostComment)
+blogRouter.put("/:blogId/comments/:commentId", isAuthenticated, isAdmin, validate({body: updateCommentSchema, params: commentParamsSchema}), updateBlogComment)
+blogRouter.delete("/:blogId/comments/:commentId", isAuthenticated, isAdmin, validate({params: commentParamsSchema}), deleteBlogPostComment)
 
 export default blogRouter;

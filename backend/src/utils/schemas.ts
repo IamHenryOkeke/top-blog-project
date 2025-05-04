@@ -52,3 +52,31 @@ export const createTagSchema = z.object({
 });
 
 export const updateTagSchema = createTagSchema.partial()
+
+// params schemas
+
+export const tagParamsSchema = z.object({
+  tagId: z.string().cuid(),
+});
+
+export const blogParamsSchema = z.object({
+  blogId: z.string().cuid()
+});
+
+export const commentParamsSchema = z.object({
+  blogId: z.string().cuid(),
+  commentId: z.string().cuid()
+});
+
+// query schemas
+
+export const tagQuerySchema = z.object({
+  searchTerm: z.string().min(3, {message: "Search term must be at least 3 characters long"}).default("").optional()
+});
+
+export const blogQuerySchema = z.object({
+  page: z.string().optional(),
+  searchTerm: z.string().min(1, {message: "Search term must be at least 3 characters long"}).default("").optional(),
+  tag: z.string().min(1, {message: "Search term must be at least 3 characters long"}).default("").optional(),
+  limit: z.string().optional(),
+});

@@ -94,7 +94,7 @@ export async function getUserByEmail(email: string) {
   }
 }
 
-export async function getAllBlogPosts(offset: number, limit: number, searchTerm: string, isPublished: boolean | undefined, tag?: string) {
+export async function getAllBlogPosts(offset: number, limit: number, searchTerm: string, isPublished?: boolean , tag?: string) {
   try {
     const data = await prisma.blogPost.findMany({
       where: {
@@ -149,10 +149,15 @@ export async function createBlogPost(values: Prisma.BlogPostCreateInput) {
 }
 
 
-export async function getBlogPostById(id: string) {
+export async function getBlogPostById(id: string, isPublished?: boolean ) {
   try {
     const data = await prisma.blogPost.findUnique({
-      where: { id },
+      where: { 
+        id,
+        isPublished: {
+          equals: isPublished
+        }, 
+      },
       include: {
         user: {
           select: {
@@ -267,10 +272,10 @@ export async function getCommentOfBlogPost(postId: string, offset: number, limit
   }
 }
 
-export async function getCommentById(id: string) {
+export async function getCommentById(id: string, postId: string) {
   try {
     const data = await prisma.comment.findUnique({
-      where: { id },
+      where: { id, postId },
       include: {
         post: {
           select: {

@@ -8,11 +8,8 @@ type SchemaMap = {
   params?: ZodSchema;
 };
 
-export const validate =
-(schemas: SchemaMap) =>
+export const validate = (schemas: SchemaMap) =>
   (req: Request, res: Response, next: NextFunction) => {
-    let errorDetails = {};
-
     if (schemas.body) {
       const result = schemas.body.safeParse(req.body);
       if (!result.success) throw new AppError('Validation failed', 400, result.error.flatten().fieldErrors);
@@ -22,7 +19,6 @@ export const validate =
     if (schemas.query) {
       const result = schemas.query.safeParse(req.query);
       if (!result.success) throw new AppError('Validation failed', 400, result.error.flatten().fieldErrors);
-      req.query = result.data;
     }
 
     if (schemas.params) {
@@ -30,7 +26,7 @@ export const validate =
       if (!result.success) throw new AppError('Validation failed', 400, result.error.flatten().fieldErrors);
       req.params = result.data;
     }
-    
+
     // If all validations pass, call the next middleware
     next();
   };

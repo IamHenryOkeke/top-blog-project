@@ -69,12 +69,15 @@ export const getLatestBlogPosts = expressAsyncHandler(
 export const getBlogPostById = expressAsyncHandler(
   async (req: Request, res: Response) => {
     const { blogId: id } = req.params;
+    const user = req.user as { id: string, role: string };
 
     if (!id) {
       throw new AppError("Blog ID is required", 400)
     }
 
-    const blog = await getBlog(id);
+    const isPublished = user?.role === "ADMIN" ? undefined : true;
+
+    const blog = await getBlog(id, isPublished);
 
     if (!blog) {
       throw new AppError("Blog not found", 404)
@@ -125,6 +128,7 @@ export const createBlogPost = expressAsyncHandler(
 export const updateBlogPost = expressAsyncHandler(
   async(req: Request, res: Response) => {
     const { blogId: id } = req.params;
+    const user = req.user as { id: string, role: string };
 
     if (!id) {
       throw new AppError("Blog ID is required", 400)
@@ -137,8 +141,6 @@ export const updateBlogPost = expressAsyncHandler(
     }
     
     const { title, description, content, thumbnailImage, tags, isPublished } = req.body;
-
-    const user = req.user as { id: string };
 
     const values = {
       title,
@@ -171,6 +173,7 @@ export const updateBlogPost = expressAsyncHandler(
 export const deleteBlogPost = expressAsyncHandler(
   async(req: Request, res: Response) => {
     const { blogId: id } = req.params;
+    const user = req.user as { id: string, role: string };
 
     if (!id) {
       throw new AppError("Blog ID is required", 400)
@@ -181,8 +184,6 @@ export const deleteBlogPost = expressAsyncHandler(
     if (!blog) {
       throw new AppError("Blog not found", 404)
     }
-
-    const user = req.user as { id: string };
 
     const data = await deleteBlog(id, user.id)
 
@@ -199,6 +200,7 @@ export const deleteBlogPost = expressAsyncHandler(
 export const getBlogPostComments = expressAsyncHandler(
   async (req: Request, res: Response) => {
     const { blogId: id } = req.params;
+    const user = req.user as { id: string, role: string };
     const { page = 1, limit = 10 } = req.query;
 
     const pageNumber = Number(page);
@@ -215,8 +217,9 @@ export const getBlogPostComments = expressAsyncHandler(
       throw new AppError("Limit must be less than or equal to 100", 400)
     }
 
+    const isPublished = user?.role === "ADMIN" ? undefined : true;
 
-    const blog = await getBlog(id);
+    const blog = await getBlog(id, isPublished);
 
     if (!blog) {
       throw new AppError("Blog not found", 404)
@@ -234,13 +237,22 @@ export const getBlogPostComments = expressAsyncHandler(
 
 export const getBlogPostCommentById = expressAsyncHandler(
   async (req: Request, res: Response) => {
-    const { commentId: id } = req.params;
+    const { commentId: id, blogId } = req.params;
+    const user = req.user as { id: string, role: string };
 
     if (!id) {
       throw new AppError("Comment ID is required", 400)
     }
 
-    const comment = await getComment(id);
+    const isPublished = user?.role === "ADMIN" ? undefined : true;
+
+    const blog = await getBlog(blogId, isPublished);
+
+    if (!blog) {
+      throw new AppError("Associated blog not found", 404)
+    }
+
+    const comment = await getComment(id, blogId);
 
     if (!comment) {
       throw new AppError("Comment not found", 404)
@@ -300,7 +312,7 @@ export const updateBlogComment = expressAsyncHandler(
     }
 
     const blog = await getBlog(blogId);
-    const comment = await getComment(commentId);
+    const comment = await getComment(commentId, blogId);
 
     if (!blog || !comment) {
       throw new AppError("Blog or Comment not found", 404)
@@ -334,7 +346,7 @@ export const deleteBlogPostComment = expressAsyncHandler(
     }
 
     const blog = await getBlog(blogId);
-    const comment = await getComment(commentId);
+    const comment = await getComment(commentId, blogId);
 
     if (!blog || !comment) {
       throw new AppError("Blog or Comment not found", 404)
