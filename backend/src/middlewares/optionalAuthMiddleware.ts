@@ -5,10 +5,10 @@ import { prisma } from "../prisma/client";
 export const optionalAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
-
+    
     if (authHeader && authHeader.startsWith("Bearer ")) {
       const token = authHeader.split(" ")[1];
-
+      
       if (!token) {
         return next();
       }

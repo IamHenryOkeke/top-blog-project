@@ -31,7 +31,16 @@ export const resetPassswordSchema = createUserSchema.omit({name: true}).merge(z.
 export const createBlogSchema = z.object({
   title: z.string().min(5, {message: "Title must be at least 5 characters long"}),
   description: z.string().min(10, {message: "Description must be at least 10 characters long"}),
-  thumbnailImage: z.string().url({message: "Thumbnail image must be a valid URL"}),
+  thumbnailImage: z
+    .instanceof(File, { message: "Image is required" })
+    .refine(
+      (file) => ["image/png", "image/jpeg", "image/jpg"].includes(file.type),
+      { message: "Invalid image file type. Only PNG and JPG are allowed." }
+    )
+    .refine(
+      (file) => file.size <= 2 * 1024 * 1024,
+      { message: "Image must be less than or equal to 2MB" }
+    ),
   content: z.string().min(20, {message: "Content must be at least 20 characters long"}),
   tags: z.array(z.string().min(3, {message: "Title must be at least 3 characters long"})),
 });
