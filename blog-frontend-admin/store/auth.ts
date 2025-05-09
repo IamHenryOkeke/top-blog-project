@@ -25,13 +25,13 @@ const useAuthStore = create(
         setHydrated: (value: boolean) => {
           set({ hydrated: value });
         },
-        logout: () => {
+        logout: (callbackUrl?: string) => {
           set({
             loggedIn: false,
             token: null,
             profile: null
           });
-          window.location.replace("/auth/login")
+          window.location.replace(`/auth/login${callbackUrl ? `?callbackUrl=${callbackUrl}` : ""}`)
         },
       })
     ),

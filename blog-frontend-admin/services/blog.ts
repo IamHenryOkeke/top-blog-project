@@ -18,6 +18,10 @@ export const BlogService = {
       const response = await axiosInstance.get('/tags');
       return response 
     },
+    addBlog: async (payload: { [key: string]: string | number | File | Array<string> }) => {
+      const response = await axiosInstance.post("/blogs", payload);
+      return response 
+    },
     addCommentToBlog: async (id: string, payload: { [key: string]: string | number }) => {
       const response = await axiosInstance.post(`/blogs/${id}/comments`, payload);
       return response 

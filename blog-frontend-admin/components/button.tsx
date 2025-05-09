@@ -17,7 +17,7 @@ export default function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    "px-4 py-2 text-sm font-semibold rounded-lg transition duration-300";
+    "px-4 py-2 text-sm inline-flex gap-2 justify-center font-semibold rounded-lg transition duration-300";
 
   const variants = {
     primary: "text-white bg-accent hover:bg-accent/80",

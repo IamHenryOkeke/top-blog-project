@@ -12,7 +12,8 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     // Add Authorization token if available
-    const token = useAuthStore.getState().token;   // Example token retrieval
+    const token = useAuthStore.getState().token;  
+    console.log(token)
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -33,7 +34,7 @@ axiosInstance.interceptors.response.use(
         if(error.request.responseURL.includes("auth")) {
           return Promise.reject(error);
         }
-        useAuthStore.getState().logout();
+        useAuthStore.getState().logout(window.location.pathname);
       }
     } else if (error.request) {
       // No response was received

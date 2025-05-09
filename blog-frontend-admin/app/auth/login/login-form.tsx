@@ -6,7 +6,7 @@ import { FormProvider, useForm } from "react-hook-form"
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import useTogglePasswordVisibility from "@/hooks/useTogglePasswordVisibility"
 import CardWrapper from "@/components/auth/card-wrapper"
-import { TextInput } from "@/components/text-input";
+import { TextInput } from "@/components/input";
 import { useState } from "react";
 import Button from "@/components/button";
 import { authService } from "@/services/auth";
@@ -36,15 +36,16 @@ export default function LoginForm() {
   })
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values)
     setIsSubmitting(true);
     try {
       const res = await authService.login(values);
-      setToken(res.token);
-      setUserProfile(res.user);
-      setLoggedIn(true);
-      toast.success("Login successful");
-      push("/dashboard/home");
+      if(res) {
+        setToken(res.token);
+        setUserProfile(res.user);
+        setLoggedIn(true);
+        toast.success("Login successful");
+        push("/dashboard/home");
+      }
     } catch (error) {
       if (error instanceof AxiosError) {
         toast.error(error.response?.data?.message || "An error occurred");

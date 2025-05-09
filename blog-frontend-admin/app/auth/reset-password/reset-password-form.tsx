@@ -7,7 +7,7 @@ import CardWrapper from "@/components/auth/card-wrapper"
 import { useState } from "react"
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5"
 import useTogglePasswordVisibility from "@/hooks/useTogglePasswordVisibility"
-import { TextInput } from "@/components/text-input"
+import { TextInput } from "@/components/input"
 import Button from "@/components/button"
 import { authService } from "@/services/auth"
 import toast from "react-hot-toast"
@@ -123,7 +123,7 @@ function ChangePassword({ email }: { email: string, setFormStatus: (value: "emai
   const onSubmit = async (values: z.infer<typeof ChangePasswordFormSchema>) => {
     setIsSubmitting(true);
     try {
-      const res = await authService.resetPassword({email, password: values.password, otp: values.otp});
+      const res = await authService.resetPassword({ email, password: values.password, otp: values.otp });
       if (res) {
         toast.success("Password changed successfully");
         setIsSubmitting(false);

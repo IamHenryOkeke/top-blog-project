@@ -19,7 +19,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="overflow-y-scroll px-6 py-8 space-y-5 bg-white dark:text-black max-h-[90vh] rounded-lg shadow-lg max-w-lg w-full animate-fadeIn scale-95"
+        className="overflow-y-scroll px-6 py-8 space-y-5 bg-white dark:text-black max-h-[90vh] rounded-lg shadow-lg max-w-2xl w-full animate-fadeIn scale-95"
         style={{ animation: "fadeIn 0.3s ease-out forwards" }}
       >
         <div className="flex items-center justify-between py-2">

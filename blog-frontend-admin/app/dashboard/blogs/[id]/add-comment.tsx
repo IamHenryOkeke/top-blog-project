@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import toast from "react-hot-toast";
-import { TextInput, TextInput2 } from "@/components/text-input";
+import { TextInput, TextInput2 } from "@/components/input";
 import { BlogService } from "@/services/blog";
 import { AxiosError } from "axios";
 import { revalidateBlogPath } from "./action";
