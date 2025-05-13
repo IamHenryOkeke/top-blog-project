@@ -44,7 +44,7 @@ export const userLogin = expressAsyncHandler(
   async(req: Request, res: Response): Promise <void> => {
     const {email, password} = req.body;
 
-    const isExistingUser = await getUserByEmail(email);
+    const isExistingUser = await getUserByEmail(email.toLowerCase());
     if(!isExistingUser) {
       throw new AppError("invalid credentials", 401)
     }

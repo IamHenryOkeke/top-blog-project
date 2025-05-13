@@ -31,18 +31,9 @@ export const resetPassswordSchema = createUserSchema.omit({name: true}).merge(z.
 export const createBlogSchema = z.object({
   title: z.string().min(5, {message: "Title must be at least 5 characters long"}),
   description: z.string().min(10, {message: "Description must be at least 10 characters long"}),
-  thumbnailImage: z
-    .instanceof(File, { message: "Image is required" })
-    .refine(
-      (file) => ["image/png", "image/jpeg", "image/jpg"].includes(file.type),
-      { message: "Invalid image file type. Only PNG and JPG are allowed." }
-    )
-    .refine(
-      (file) => file.size <= 2 * 1024 * 1024,
-      { message: "Image must be less than or equal to 2MB" }
-    ),
+  thumbnailImage: z.string().url({message: "Must be a valid url"}),
   content: z.string().min(20, {message: "Content must be at least 20 characters long"}),
-  tags: z.array(z.string().min(3, {message: "Title must be at least 3 characters long"})),
+  tags: z.array(z.string().cuid()),
 });
 
 export const updateBlogSchema = createBlogSchema.partial().merge(z.object({
@@ -85,7 +76,7 @@ export const tagQuerySchema = z.object({
 
 export const blogQuerySchema = z.object({
   page: z.string().optional(),
-  searchTerm: z.string().min(1, {message: "Search term must be at least 3 characters long"}).default("").optional(),
-  tag: z.string().min(1, {message: "Search term must be at least 3 characters long"}).default("").optional(),
+  searchTerm: z.string().min(1, {message: "Search term must be at least 1 characters long"}).default("").optional(),
+  tag: z.string().min(1, {message: "Tag term must be at least 1 characters long"}).default("").optional(),
   limit: z.string().optional(),
 });

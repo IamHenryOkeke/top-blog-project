@@ -92,7 +92,7 @@ export const getBlogPostById = expressAsyncHandler(
 
 export const createBlogPost = expressAsyncHandler(
   async(req: Request, res: Response) => {
-    const { title, description, content, thumbnailImage, tags } = req.body;
+    const { title, description, content, tags, thumbnailImage } = req.body;
 
     const user = req.user as { id: string };
 
@@ -143,11 +143,12 @@ export const updateBlogPost = expressAsyncHandler(
     const { title, description, content, thumbnailImage, tags, isPublished } = req.body;
 
     const values = {
-      title,
-      description,
+      title: title.trim(),
+      description: description.trim(),
       thumbnailImage,
       content,
       isPublished,
+      ...((blog.isPublished && isPublished) ? ({ publishedAt: blog.publishedAt}): isPublished ? ({ publishedAt: new Date()}): ({ publishedAt: blog.createdAt})),
       ...(tags && {
         tags: {
           set: [],
@@ -222,7 +223,7 @@ export const getBlogPostComments = expressAsyncHandler(
     const blog = await getBlog(id, isPublished);
 
     if (!blog) {
-      throw new AppError("Blog not found", 404)
+      throw new AppError("Associated comments of blog not found", 404)
     }
 
     const offset = (pageNumber - 1) * limitNumber;
@@ -348,8 +349,12 @@ export const deleteBlogPostComment = expressAsyncHandler(
     const blog = await getBlog(blogId);
     const comment = await getComment(commentId, blogId);
 
-    if (!blog || !comment) {
-      throw new AppError("Blog or Comment not found", 404)
+    if (!blog) {
+      throw new AppError("Associated Blog not found", 404)
+    }
+
+    if (!comment) {
+      throw new AppError("Comment not found", 404)
     }
 
     const data = await deleteComment(commentId, blogId)

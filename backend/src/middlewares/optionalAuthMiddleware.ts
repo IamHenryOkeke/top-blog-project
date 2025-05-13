@@ -31,7 +31,6 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
     next();
   } catch (error) {
     // If token is invalid, still continue as guest
-    console.error("Optional auth error:", error);
     next();
   }
 };

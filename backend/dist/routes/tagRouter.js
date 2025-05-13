@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const authMiddlewares_1 = require("../middlewares/authMiddlewares");
+const tagController_1 = require("../controllers/tagController");
+const validation_1 = require("../middlewares/validation");
+const schemas_1 = require("../utils/schemas");
+const tagRouter = (0, express_1.Router)();
+tagRouter.get("/", (0, validation_1.validate)({ query: schemas_1.tagQuerySchema }), tagController_1.getAllTags);
+tagRouter.post("/", authMiddlewares_1.isAuthenticated, authMiddlewares_1.isAdmin, (0, validation_1.validate)({ body: schemas_1.createTagSchema }), tagController_1.createTag);
+tagRouter.get("/:tagId", (0, validation_1.validate)({ params: schemas_1.tagParamsSchema }), tagController_1.getTagById);
+tagRouter.put("/:tagId", authMiddlewares_1.isAuthenticated, authMiddlewares_1.isAdmin, (0, validation_1.validate)({ body: schemas_1.updateTagSchema, params: schemas_1.tagParamsSchema }), tagController_1.updateTag);
+tagRouter.delete("/:tagId", authMiddlewares_1.isAuthenticated, authMiddlewares_1.isAdmin, (0, validation_1.validate)({ params: schemas_1.tagParamsSchema }), tagController_1.deleteTag);
+exports.default = tagRouter;

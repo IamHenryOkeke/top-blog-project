@@ -120,11 +120,11 @@ export async function getAllBlogPosts(offset: number, limit: number, searchTerm:
           }
         }
       },
+      orderBy: {
+        publishedAt: 'desc'
+      },
       ...((limit > 0) && { take: limit }),
       skip: offset,
-      orderBy: {
-        createdAt: 'desc'
-      }
     })
     return data;
   } catch (error) {
@@ -367,7 +367,7 @@ export async function getTagById(id: string) {
             title: true,
             description: true,
             createdAt: true,
-            updatedAt: true
+            publishedAt: true
           }
         }
       }
