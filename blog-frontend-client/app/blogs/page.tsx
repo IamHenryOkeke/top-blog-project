@@ -1,15 +1,9 @@
-import BlogCard from "@/components/blog-card";
-import Pagination from "@/components/pagination";
+import BlogsSection from "@/components/blogs/blogs";
 import Search from "@/components/search";
 import Tag from "@/components/tag";
 import { BlogService } from "@/services/blog";
+import { Metadata } from "next";
 
-
-async function getAllBlogs(payload: { [key: string]: string | number }) {
-  const res = await BlogService.getAllBlogs(payload);
-  const blogs = res.data;
-  return blogs;
-}
 
 async function getAllTags() {
   const res = await BlogService.getAllTags();
@@ -17,16 +11,19 @@ async function getAllTags() {
   return blog;
 }
 
+export const metadata: Metadata = {
+  title: "Blogs | NmesomaHenry's Blog",
+}
+
 export default async function Blogs({ searchParams }: { searchParams: { [key: string]: string | number } }) {
-  const [blogs, tags] = await Promise.all([
-    getAllBlogs({
-      limit: 5,
-      ...searchParams
-    }),
-    getAllTags()
-  ]);
+  const params = {
+    limit: 5,
+    ...searchParams
+  }
+  const tags = await getAllTags();
+
   return (
-    <main className="">
+    <main>
       <section className="text-center pt-12">
         <h2 className="text-4xl font-bold text-accent">All Blog Posts</h2>
       </section>
@@ -39,27 +36,7 @@ export default async function Blogs({ searchParams }: { searchParams: { [key: st
             <Tag tags={tags.data} />
           </div>
         </div>
-        {
-          blogs && blogs.data.length > 0 ?
-            <div className="grid md:grid-cols-2 gap-8">
-              {
-                blogs.data.map((blog: { id: string, title: string, description: string, createdAt: string }) => (
-                  <BlogCard
-                    key={blog.id}
-                    id={blog.id}
-                    title={blog.title}
-                    description={blog.description}
-                    createdAt={blog.createdAt}
-                  />
-                ))
-              }
-            </div>
-            :
-            <div className="flex justify-center items-center">
-              <h2 className="text-2xl font-bold text-gray-500">No blogs found</h2>
-            </div>
-        }
-        <Pagination totalPages={blogs.pagination.totalPages} currentPage={blogs.pagination.page} />
+        <BlogsSection queryParams={params} />
       </section>
     </main >
   );

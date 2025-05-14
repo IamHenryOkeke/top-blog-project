@@ -1,10 +1,6 @@
-import BlogCard from "@/components/blog-card";
-import { BlogService } from "@/services/blog";
-import Link from "next/link";
+import LatestPosts from "@/components/home/latest-posts";
 
 export default async function Home() {
-  const res = await BlogService.getLatestBlogs();
-  const blogs = res.data.data;
   return (
     <main className="">
       <section className="text-center py-12">
@@ -18,24 +14,7 @@ export default async function Home() {
           <p className="text-lg">Stay updated with my latest articles and insights.</p>
         </div>
       </section>
-      <section className="max-w-4xl mx-auto px-4 py-8">
-        <div className="grid md:grid-cols-2 gap-8">
-          {
-            blogs.map((blog: { id: string, title: string, description: string, createdAt: string }) => (
-              <BlogCard
-                key={blog.id}
-                id={blog.id}
-                title={blog.title}
-                description={blog.description}
-                createdAt={blog.createdAt}
-              />
-            ))
-          }
-        </div>
-        <div className="text-center mt-8">
-          <Link href="/blogs" className="inline-block bg-[#4682B4] text-white px-4 py-2 rounded hover:bg-[#3A6E99] transition">View All Blogs</Link>
-        </div>
-      </section>
+      <LatestPosts />
     </main>
   );
 }
