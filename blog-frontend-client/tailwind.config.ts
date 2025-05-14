@@ -13,6 +13,9 @@ const config: Config = {
         primary: "#333333",
         accent: "#4682B4"
       },
+      fontFamily: {
+        leagueSpartan: ["League Spartan", "sans-serif"]
+      },
     },
   },
   plugins: [],

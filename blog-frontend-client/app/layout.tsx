@@ -2,15 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
-
-import { League_Spartan } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import QueryProvider from "@/provider/queryClientProvider";
 
-const leagueSpartan = League_Spartan({
-  variable: "--font-league-spartan",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "NmesomaHenry's Blog",
@@ -24,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`lg:max-w-7xl mx-auto  antialiased bg-background text-primary ${leagueSpartan.className}`}>
+      <body className="lg:max-w-7xl mx-auto  antialiased bg-background text-primary font-leagueSpartan">
         <Toaster />
         <Navbar />
         <QueryProvider>
