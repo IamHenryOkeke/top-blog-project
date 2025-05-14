@@ -31,7 +31,7 @@ const useAuthStore = create(
             token: null,
             profile: null
           });
-          window.location.replace(`/auth/login${callbackUrl ? `?callbackUrl=${callbackUrl}` : ""}`)
+          window.location.replace(`/auth/login${callbackUrl ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""}`)
         },
       })
     ),

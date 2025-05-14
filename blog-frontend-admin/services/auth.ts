@@ -5,6 +5,10 @@ export const authService = {
     const response = await axiosInstance.post("/auth/login", payload);
     return response.data;
   },
+  signUp: async (payload: { [key: string]: string | number }) => {
+    const response = await axiosInstance.post("/auth/sign-up", payload);
+    return response.data;
+  },
   sendOTP: async (payload: { [key: string]: string | number }) => {
     const response = await axiosInstance.post("/auth/send-otp", payload);
     return response.data;

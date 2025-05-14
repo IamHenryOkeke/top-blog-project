@@ -14,12 +14,20 @@ export const BlogService = {
       const response = await axiosInstance.get(`/blogs/${id}/comments`);
       return response 
     },
-    getAllTags: async () => {
-      const response = await axiosInstance.get('/tags');
+    addBlog: async (payload: FormData) => {
+      const response = await axiosInstance.post("/blogs", payload, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
       return response 
     },
-    addBlog: async (payload: { [key: string]: string | number | File | Array<string> }) => {
-      const response = await axiosInstance.post("/blogs", payload);
+    updateBlog: async (id: string, payload: FormData) => {
+      const response = await axiosInstance.put(`/blogs/${id}`, payload, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      return response 
+    },
+    deleteteBlog: async (id: string) => {
+      const response = await axiosInstance.delete(`/blogs/${id}`);
       return response 
     },
     addCommentToBlog: async (id: string, payload: { [key: string]: string | number }) => {

@@ -2,7 +2,7 @@ import useAuthStore from "@/store/auth";
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000/api", 
+  baseURL: process.env.NEXT_PUBLIC_API_URL, 
   headers: {
     "Content-Type": "application/json",
   },
@@ -13,7 +13,6 @@ axiosInstance.interceptors.request.use(
   (config) => {
     // Add Authorization token if available
     const token = useAuthStore.getState().token;  
-    console.log(token)
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

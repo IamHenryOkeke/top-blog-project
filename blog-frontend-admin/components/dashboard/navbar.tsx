@@ -6,9 +6,9 @@ import Button from '../button';
 import useAuthStore from '@/store/auth';
 
 const navLinks = [
-  { label: 'Home', href: './home' },
-  { label: 'Blogs', href: './blogs' },
-  { label: 'Tags', href: './tags' }
+  { label: 'Home', href: '/dashboard/home' },
+  { label: 'Blogs', href: '/dashboard/blogs' },
+  { label: 'Tags', href: '/dashboard/tags' }
 ]
 
 export default function Navbar() {

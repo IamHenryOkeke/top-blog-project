@@ -5,7 +5,7 @@ import { CiSearch } from 'react-icons/ci'
 import { useDebouncedCallback } from 'use-debounce'
 import { useSearchParams, usePathname, useRouter } from 'next/navigation'
 
-export default function Search() {
+export default function Search({ placeholder }: { placeholder: string }) {
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const router = useRouter()
@@ -29,7 +29,7 @@ export default function Search() {
         onChange={(e) => {
           handleSearch(e.target.value.trim())
         }}
-        defaultValue={searchParams.get('searchTerm')?.toString()} placeholder='Search for a post.....' className='h-10 lg:h-12 w-full pl-7 pr-2 lg:px-10 text-justify text-slate-500 lg:text-lg font-medium focus:outline-none border border-slate-500 rounded-xl'
+        defaultValue={searchParams.get('searchTerm')?.toString()} placeholder={placeholder} className='h-10 lg:h-12 w-full pl-7 pr-2 lg:px-10 text-justify text-slate-500 lg:text-lg font-medium focus:outline-none border border-slate-500 rounded-xl'
       />
     </div>
   )

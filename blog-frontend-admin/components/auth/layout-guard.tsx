@@ -1,5 +1,6 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/store/auth";
@@ -17,6 +18,8 @@ export default function LayoutGuard({
   children,
   loadingComponent = <div className="flex items-center justify-center h-screen">Loading...</div>
 }: LayoutGuardProps) {
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl');
   const { token, loggedIn, hydrated } = useAuthStore();
   const router = useRouter();
 
@@ -30,9 +33,9 @@ export default function LayoutGuard({
     }
 
     if (!requireAuth && isAuthenticated) {
-      router.replace(redirectTo);
+      router.replace(callbackUrl || redirectTo);
     }
-  }, [hydrated, isAuthenticated, requireAuth, redirectTo, router]);
+  }, [hydrated, isAuthenticated, requireAuth, callbackUrl, redirectTo, router]);
 
   if (!hydrated) return loadingComponent;
 

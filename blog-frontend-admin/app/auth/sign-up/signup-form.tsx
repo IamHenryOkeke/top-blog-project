@@ -12,22 +12,29 @@ import Button from "@/components/button";
 import { authService } from "@/services/auth";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
-import useAuthStore from "@/store/auth";
+import { useRouter } from "next/navigation";
 
-const formSchema = z.object({
-  email: z.string().email({ message: "Must be a valid email" }),
-  password: z.string()
+export const formSchema = z.object({
+  name: z.string({ message: "Name is required" }).min(3, { message: "Name must be at least 3 characters long" }),
+  email: z.string({ message: "Email is required" }).email({ message: "Email must be valid" }),
+  password: z
+    .string()
     .min(8, { message: "Password must be at least 8 characters long" })
-})
+    .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
+    .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
+    .regex(/[0-9]/, { message: "Password must contain at least one number" })
+    .regex(/[^A-Za-z0-9]/, { message: "Password must contain at least one special character" })
+});
 
-export default function LoginForm() {
-  const { isVisible, toggleVisibility } = useTogglePasswordVisibility();
+export default function SignUpForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { setToken, setLoggedIn, setUserProfile } = useAuthStore();
+  const { isVisible, toggleVisibility } = useTogglePasswordVisibility();
+  const { push } = useRouter()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: ""
     },
@@ -36,13 +43,10 @@ export default function LoginForm() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     try {
-      const res = await authService.login(values);
-      console.log(res)
+      const res = await authService.signUp(values);
       if (res) {
-        setToken(res.token);
-        setUserProfile(res.user);
-        setLoggedIn(true);
-        toast.success("Login successful");
+        toast.success("Sign Up successful");
+        push("/auth/login")
       }
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -56,16 +60,16 @@ export default function LoginForm() {
 
   return (
     <CardWrapper
-      title='Login'
-      description='Welcome back'
-      footerPara='Forgot your password?'
+      title='Sign Up'
+      footerPara='Already have an account?'
       footerLink={{
-        href: "/auth/reset-password",
-        text: "Reset Password"
+        href: "/auth/login",
+        text: "Log in"
       }}
     >
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <TextInput name='name' label="Name" placeholder="Enter your name" />
           <TextInput name='email' label="Email Address" placeholder="Enter Email Address" />
           <div className="relative">
             <TextInput name='password' type={isVisible ? "text" : "password"} label="Password" placeholder="Enter your password" />
@@ -81,7 +85,7 @@ export default function LoginForm() {
               fullWidth={true}
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Logging In..." : "Log In"}
+              {isSubmitting ? "Signing up..." : "Sign up"}
             </Button>
 
           </div>

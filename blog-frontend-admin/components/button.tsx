@@ -2,7 +2,7 @@ import React from "react";
 import { cn } from "@/lib/utils"; // A utility for conditional classNames
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "outline" | "ghost";
+  variant?: "primary" | "outline" | "destructive";
   loading?: boolean;
   fullWidth?: boolean;
 }
@@ -23,7 +23,7 @@ export default function Button({
     primary: "text-white bg-accent hover:bg-accent/80",
     outline:
       "border border-accent text-accent bg-transparent hover:bg-accent/10",
-    ghost: "bg-transparent text-accent hover:bg-accent/10",
+    destructive: "bg-red-600 hover:bg-red-700 text-white"
   };
 
   const disabledStyles = "opacity-50 cursor-not-allowed";

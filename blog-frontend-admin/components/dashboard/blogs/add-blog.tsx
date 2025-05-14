@@ -11,6 +11,7 @@ import { BlogService } from "@/services/blog";
 import { AxiosError } from "axios";
 import Button from "@/components/button";
 import MarkdownEditor from "@/components/markdown-editor";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const addBlogSchema = z.object({
   title: z.string().min(5, { message: "Title must be at least 5 characters long" }),
@@ -26,11 +27,14 @@ export const addBlogSchema = z.object({
       (file) => file.size <= 2 * 1024 * 1024, // 2MB in bytes
       { message: "Image must be less than or equal to 2MB" }
     ),
-  tags: z.array(z.string()).min(1, 'Select at least one tag')
+  tags: z.array(z.string(), { required_error: "Select at least one" }).min(1, 'Select at least one tag')
 });
+
+
 
 export default function AddBlog({ tags }: { tags: { id: string, name: string }[] }) {
   const [openModal, setOpenModal] = useState(false);
+  const queryClient = useQueryClient()
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof addBlogSchema>>({
@@ -47,10 +51,17 @@ export default function AddBlog({ tags }: { tags: { id: string, name: string }[]
   const onSubmit = (data: z.infer<typeof addBlogSchema>) => {
     console.log(data)
     startTransition(async () => {
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append("description", data.description);
+      formData.append("content", data.content);
+      formData.append("thumbnailImage", data.thumbnailImage);
+      formData.append('tags', JSON.stringify(data.tags));
       try {
-        const res = await BlogService.addBlog(data);
+        const res = await BlogService.addBlog(formData);
         if (res.status === 201) {
-          toast.success("Comment added successfully");
+          toast.success("Blog added successfully");
+          queryClient.invalidateQueries({ queryKey: ['blogs'] })
           setOpenModal(false);
           form.reset();
         }
@@ -84,7 +95,7 @@ export default function AddBlog({ tags }: { tags: { id: string, name: string }[]
       </Button>
       <Modal isOpen={openModal} onClose={() => setOpenModal(false)} title="Add Blog">
         <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" encType="multipart/form-data">
             <TextInput name='title' label="Title" placeholder="Enter title" />
             <TextInput name='description' label="Description" placeholder="Enter description" />
             <div className="w-full flex flex-col gap-2">
@@ -101,16 +112,23 @@ export default function AddBlog({ tags }: { tags: { id: string, name: string }[]
             <fieldset className="space-y-2">
               <legend className="font-medium">Tags:</legend>
               {tags.map((tag) => (
-                <label key={tag.id} className="block capitalize">
+                <label key={tag.id} className="block w-fit capitalize">
                   <input
                     type="checkbox"
                     value={tag.id}
                     {...form.register('tags')}
                     className="mr-2"
+                    onChange={() => console.log(form.getValues("tags"))}
                   />
                   {tag.name}
                 </label>
               ))}
+              <input
+                type="checkbox"
+                value=""
+                {...form.register('tags')}
+                className="mr-2 hidden"
+              />
               {form.formState.errors.tags && (
                 <p className="text-red-500">{form.formState.errors.tags.message}</p>
               )}
