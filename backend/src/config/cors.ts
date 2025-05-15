@@ -1,6 +1,6 @@
 import { AppError } from "../error/errorHandler";
 
-const whitelist = ['http://localhost:3000', 'http://localhost:3001'];
+const whitelist = process.env.CORS_WHITELIST?.split(',') || [];;
 
 const corsOptions = {
   origin: function (origin: string | undefined, callback: (error: Error | null, allowOrigin?: boolean | string) => void) {
