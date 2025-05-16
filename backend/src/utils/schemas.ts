@@ -80,3 +80,4 @@ export const blogQuerySchema = z.object({
   tag: z.string().min(1, {message: "Tag term must be at least 1 characters long"}).default("").optional(),
   limit: z.string().optional(),
 });
+

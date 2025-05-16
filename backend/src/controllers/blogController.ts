@@ -202,20 +202,9 @@ export const getBlogPostComments = expressAsyncHandler(
   async (req: Request, res: Response) => {
     const { blogId: id } = req.params;
     const user = req.user as { id: string, role: string };
-    const { page = 1, limit = 10 } = req.query;
-
-    const pageNumber = Number(page);
-    const limitNumber = Number(limit);
     
     if (!id) {
       throw new AppError("Blog ID is required", 400)
-    }
-
-    if (pageNumber < 1 || limitNumber < 1) {
-      throw new AppError("Page and limit must be greater than 0", 400)
-    }
-    if (limitNumber > 100) {
-      throw new AppError("Limit must be less than or equal to 100", 400)
     }
 
     const isPublished = user?.role === "ADMIN" ? undefined : true;
@@ -226,8 +215,7 @@ export const getBlogPostComments = expressAsyncHandler(
       throw new AppError("Associated comments of blog not found", 404)
     }
 
-    const offset = (pageNumber - 1) * limitNumber;
-    const comments = await getComments(id, offset, limitNumber);
+    const comments = await getComments(id);
 
     res.status(200).json({
       message: "Comments fetched successfully",

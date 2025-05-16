@@ -254,14 +254,12 @@ export async function createComment(values: Prisma.CommentCreateInput) {
   }
 }
 
-export async function getCommentOfBlogPost(postId: string, offset: number, limit: number) { 
+export async function getCommentOfBlogPost(postId: string) { 
   try {
     const data = await prisma.comment.findMany({
       where: {
         postId
       },
-      ...((limit > 0) && { take: limit }),
-      skip: offset,
       orderBy: {
         createdAt: 'desc'
       }
