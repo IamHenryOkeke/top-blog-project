@@ -132,6 +132,51 @@ export async function getAllBlogPosts(offset: number, limit: number, searchTerm:
   }
 }
 
+export async function getRelatedBlogPosts(postId: string, limit: number = 3) {
+  try {
+    const currentPost = await prisma.blogPost.findUnique({
+      where: { id: postId },
+      include: { tags: true }
+    });
+
+    if (!currentPost) {
+      throw new AppError("Post not found", 404);
+    }
+
+    const tagNames = currentPost.tags.map(tag => tag.name);
+
+    const relatedPosts = await prisma.blogPost.findMany({
+      where: {
+        id: { not: postId },
+        isPublished: true,
+        tags: {
+          some: {
+            name: { in: tagNames }
+          }
+        }
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          }
+        }
+      },
+      orderBy: {
+        publishedAt: 'desc'
+      },
+      take: limit
+    });
+
+    return relatedPosts;
+  } catch (error) {
+    throw new AppError("Failed to fetch related posts", 500);
+  }
+}
+
+
 export async function createBlogPost(values: Prisma.BlogPostCreateInput) {
   try {
     const data = await prisma.blogPost.create({

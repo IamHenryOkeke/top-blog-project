@@ -4,6 +4,7 @@ import { AppError } from "../error/errorHandler";
 import { 
   createBlogPost as createBlog,
   getBlogPostById as getBlog,
+  getRelatedBlogPosts as getRelatedPosts,
   updateBlogPost as updateBlog,
   deleteBlogPost as deleteBlog,
   getAllBlogPosts as getBlogs,
@@ -86,6 +87,32 @@ export const getBlogPostById = expressAsyncHandler(
     res.status(200).json({
       message: "Blog fetched successfully",
       data: blog,
+    });
+  }
+);
+
+export const getRelatedBlogPosts = expressAsyncHandler(
+  async (req: Request, res: Response) => {
+    const { blogId: id } = req.params;
+    const user = req.user as { id: string, role: string };
+
+    if (!id) {
+      throw new AppError("Blog ID is required", 400)
+    }
+
+    const isPublished = user?.role === "ADMIN" ? undefined : true;
+
+    const blog = await getBlog(id, isPublished);
+
+    if (!blog) {
+      throw new AppError("Blog not found", 404)
+    }
+
+    const relatedBlogPosts = await getRelatedPosts(blog.id)
+
+    res.status(200).json({
+      message: "Related Blogs fetched successfully",
+      data: relatedBlogPosts,
     });
   }
 );

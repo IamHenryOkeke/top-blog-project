@@ -11,7 +11,8 @@ import {
   createBlogComment, 
   updateBlogComment,
   deleteBlogPostComment,
-  getLatestBlogPosts
+  getLatestBlogPosts,
+  getRelatedBlogPosts
 } from "../controllers/blogController";
 import { isAuthenticated, isAdmin } from "../middlewares/authMiddlewares";
 import { optionalAuth } from "../middlewares/optionalAuthMiddleware";
@@ -31,6 +32,8 @@ blogRouter.delete("/:blogId", isAuthenticated, isAdmin,validate({params: blogPar
 
 blogRouter.get("/:blogId/comments", validate({params: blogParamsSchema}), optionalAuth, getBlogPostComments)
 blogRouter.post("/:blogId/comments", validate({body: createCommentSchema, params: blogParamsSchema}), createBlogComment)
+
+blogRouter.get("/:blogId/related-posts", validate({params: blogParamsSchema}), optionalAuth,  getRelatedBlogPosts)
 
 blogRouter.get("/:blogId/comments/:commentId", validate({params: commentParamsSchema}), optionalAuth, getBlogPostCommentById)
 
