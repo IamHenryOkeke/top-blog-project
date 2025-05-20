@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { TextInput, TextInput2 } from "@/components/text-input";
 import { AxiosError } from "axios";
+import Button from "@/components/button";
 
 const contactSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
@@ -24,7 +25,7 @@ export default function ContactForm() {
   const onSubmit = (data: z.infer<typeof contactSchema>) => {
     startTransition(async () => {
       try {
-        const mailtoLink = `mailto:your@email.com?subject=Message from ${encodeURIComponent(
+        const mailtoLink = `mailto:iamhenryokeke@gmail.com?subject=Message from ${encodeURIComponent(
           data.name
         )}&body=${encodeURIComponent(`Email: ${data.email}\n\nMessage:\n${data.message}`)}`;
 
@@ -34,12 +35,9 @@ export default function ContactForm() {
         methods.reset();
       } catch (error) {
         const err = error as AxiosError<{ message: string }>;
-
         if (err.response) {
-          console.log("Error response:", err.response);
           toast.error(err.response.data?.message || "Something went wrong");
         } else if (err.request) {
-          console.log("No response received:", err.request);
           toast.error("No response from server");
         } else {
           console.log("Error", err.message);
@@ -61,13 +59,13 @@ export default function ContactForm() {
             <TextInput2 name="message" label="Message" placeholder="Your Message" />
 
             <div className="flex justify-center">
-              <button
+              <Button
                 type="submit"
                 disabled={isPending}
                 className={`px-6 py-2 text-white font-semibold bg-accent rounded-lg hover:bg-accent/80 transition duration-300 ${isPending && "opacity-50 cursor-not-allowed"}`}
               >
                 {isPending ? "Sending..." : "Send Message"}
-              </button>
+              </Button>
             </div>
           </form>
         </FormProvider>

@@ -1,6 +1,7 @@
 import AddComment from "@/components/blogs/[id]/add-comment";
 import Post from "@/components/blogs/[id]/blog";
 import CommentsSection from "@/components/blogs/[id]/comments";
+import RelatedBlogs from "@/components/blogs/[id]/related-posts";
 import { BlogService } from "@/services/blog";
 import { Metadata } from "next";
 
@@ -32,6 +33,10 @@ export default async function page({ params }: { params: { id: string } }) {
           </div>
           <CommentsSection id={id} />
         </div>
+      </div>
+      <div className="my-5">
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Related Posts</h2>
+        <RelatedBlogs id={id} />
       </div>
     </main>
   )

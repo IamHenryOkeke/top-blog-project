@@ -10,6 +10,10 @@ export const BlogService = {
       const response = await axiosInstance.get('/blogs/latest');
       return response 
     },
+    getRelatedBlogs: async (id: string) => {
+      const response = await axiosInstance.get(`/blogs/${id}/related-posts`);
+      return response 
+    },
     getBlogById: async (id: string) => {
       const response = await axiosInstance.get(`/blogs/${id}`);
       return response 
