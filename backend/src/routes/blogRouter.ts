@@ -1,5 +1,4 @@
 import { Router } from "express";
-const { upload } = require("../config/multer");
 import { 
   createBlogPost, 
   deleteBlogPost, 
@@ -19,6 +18,7 @@ import { optionalAuth } from "../middlewares/optionalAuthMiddleware";
 import { validate } from "../middlewares/validation";
 import { blogParamsSchema, blogQuerySchema, commentParamsSchema, createBlogSchema, createCommentSchema, updateBlogSchema, updateCommentSchema } from "../utils/schemas";
 import { addFilePathToBody } from "../middlewares/addFilePathToBody";
+import { upload } from "../config/multer";
 
 const blogRouter = Router();
 
